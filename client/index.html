@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyShop Mini E-commerce</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>MyShop</h1>
+        <p>Chuỗi cửa hàng trực tuyến thân thiện</p>
+      </div>
+      <div class="topbar-actions">
+        <button id="darkModeToggle" class="toggle-btn">Chế độ tối</button>
+        <button id="cartToggle" class="cart-btn">Giỏ hàng (<span id="cartCount">0</span>)</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-card">
+        <div>
+          <h2>Shop thông minh, mua sắm nhanh chóng</h2>
+          <p>Tìm kiếm sản phẩm ưa thích, quản lý giỏ hàng và nhận gợi ý từ trợ lý AI bằng tiếng Việt.</p>
+        </div>
+        <div class="hero-image"></div>
+      </section>
+
+      <section class="filters">
+        <div class="filter-group">
+          <label for="searchInput">Tìm kiếm sản phẩm</label>
+          <input id="searchInput" type="text" placeholder="Nhập tên sản phẩm..." />
+        </div>
+        <div class="filter-group">
+          <label for="priceFilter">Lọc theo giá</label>
+          <select id="priceFilter">
+            <option value="all">Tất cả</option>
+            <option value="budget">Dưới 2.000.000₫</option>
+            <option value="mid">2.000.000₫ - 5.000.000₫</option>
+            <option value="premium">Trên 5.000.000₫</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="products-grid" id="productGrid"></section>
+    </main>
+
+    <aside class="cart-panel" id="cartPanel">
+      <div class="cart-header">
+        <h3>Giỏ hàng</h3>
+        <button id="closeCart" aria-label="Đóng giỏ hàng">×</button>
+      </div>
+      <div class="cart-body" id="cartItems"></div>
+      <div class="cart-footer">
+        <div>
+          <span>Tổng cộng:</span>
+          <strong id="cartTotal">0₫</strong>
+        </div>
+        <button id="checkoutBtn" class="primary-btn">Thanh toán</button>
+      </div>
+    </aside>
+
+    <div class="chat-widget">
+      <button id="openChat" class="chat-open-btn">Chat</button>
+      <div class="chat-box" id="chatBox">
+        <div class="chat-header">
+          <div>
+            <strong>Trợ lý MyShop</strong>
+            <span>Hỏi ngay để nhận gợi ý mua sắm</span>
+          </div>
+          <button id="closeChat" aria-label="Đóng chat">×</button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <form id="chatForm" class="chat-input-row">
+          <input id="chatInput" type="text" placeholder="Nhập câu hỏi của bạn..." autocomplete="off" />
+          <button type="submit">Gửi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script src="chatbot.js"></script>
+</body>
+</html>

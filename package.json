@@ -1,0 +1,50 @@
+{
+  "name": "test-myshop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shopee-inspired e-commerce platform built with Next.js 15, PostgreSQL, Prisma, and Tailwind CSS.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.7.4",
+    "@prisma/client": "^6.7.0",
+    "@tanstack/react-query": "^5.72.1",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.7.4",
+    "lucide-react": "^0.507.0",
+    "next": "^15.3.1",
+    "next-auth": "^5.0.0-beta.25",
+    "openai": "^4.104.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "redis": "^4.7.0",
+    "socket.io-client": "^4.8.1",
+    "stripe": "^16.10.0",
+    "tailwind-merge": "^3.2.0",
+    "zod": "^3.24.3",
+    "zustand": "^5.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.23.0",
+    "eslint-config-next": "^15.3.1",
+    "postcss": "^8.5.3",
+    "prisma": "^6.7.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3"
+  }
+}
