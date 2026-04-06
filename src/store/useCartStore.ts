@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export type CartVariant = {
   id: string;
@@ -21,6 +22,8 @@ export type CartItem = {
 type CartState = {
   items: CartItem[];
   voucherCode: string;
+  hydrated: boolean;
+  setHydrated: (hydrated: boolean) => void;
   setVoucherCode: (voucherCode: string) => void;
   addItem: (item: CartVariant, quantity?: number) => void;
   removeItem: (variantId: string) => void;
@@ -32,64 +35,91 @@ type CartState = {
   subtotal: () => number;
 };
 
-export const useCartStore = create<CartState>((set, get) => ({
-  items: [],
-  voucherCode: "",
-  setVoucherCode: (voucherCode) => set({ voucherCode }),
-  addItem: (item, quantity = 1) =>
-    set((state) => {
-      const existing = state.items.find(
-        (cartItem) => cartItem.variant.id === item.id,
-      );
-      if (existing) {
-        return {
-          items: state.items.map((cartItem) =>
-            cartItem.variant.id === item.id
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      voucherCode: "",
+      hydrated: false,
+      setHydrated: (hydrated) => set({ hydrated }),
+      setVoucherCode: (voucherCode) => set({ voucherCode }),
+      addItem: (item, quantity = 1) =>
+        set((state) => {
+          const existing = state.items.find(
+            (cartItem) => cartItem.variant.id === item.id,
+          );
+          if (existing) {
+            return {
+              items: state.items.map((cartItem) =>
+                cartItem.variant.id === item.id
+                  ? {
+                      ...cartItem,
+                      quantity: Math.min(
+                        cartItem.quantity + quantity,
+                        item.stock,
+                      ),
+                    }
+                  : cartItem,
+              ),
+            };
+          }
+          return {
+            items: [
+              ...state.items,
+              {
+                variant: item,
+                quantity: Math.max(1, Math.min(quantity, item.stock)),
+                selected: true,
+              },
+            ],
+          };
+        }),
+      removeItem: (variantId) =>
+        set((state) => ({
+          items: state.items.filter((item) => item.variant.id !== variantId),
+        })),
+      updateQuantity: (variantId, quantity) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.variant.id === variantId
               ? {
-                  ...cartItem,
-                  quantity: Math.min(cartItem.quantity + quantity, item.stock),
+                  ...item,
+                  quantity: Math.max(1, Math.min(quantity, item.variant.stock)),
                 }
-              : cartItem,
+              : item,
           ),
-        };
-      }
-      return {
-        items: [...state.items, { variant: item, quantity, selected: true }],
-      };
+        })),
+      toggleItem: (variantId) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.variant.id === variantId
+              ? { ...item, selected: !item.selected }
+              : item,
+          ),
+        })),
+      toggleAll: (selected) =>
+        set((state) => ({
+          items: state.items.map((item) => ({ ...item, selected })),
+        })),
+      clearCart: () => set({ items: [], voucherCode: "" }),
+      selectedItems: () => get().items.filter((item) => item.selected),
+      subtotal: () =>
+        get().items.reduce(
+          (sum, item) =>
+            item.selected ? sum + item.quantity * item.variant.price : sum,
+          0,
+        ),
     }),
-  removeItem: (variantId) =>
-    set((state) => ({
-      items: state.items.filter((item) => item.variant.id !== variantId),
-    })),
-  updateQuantity: (variantId, quantity) =>
-    set((state) => ({
-      items: state.items.map((item) =>
-        item.variant.id === variantId
-          ? {
-              ...item,
-              quantity: Math.max(1, Math.min(quantity, item.variant.stock)),
-            }
-          : item,
-      ),
-    })),
-  toggleItem: (variantId) =>
-    set((state) => ({
-      items: state.items.map((item) =>
-        item.variant.id === variantId
-          ? { ...item, selected: !item.selected }
-          : item,
-      ),
-    })),
-  toggleAll: (selected) =>
-    set((state) => ({
-      items: state.items.map((item) => ({ ...item, selected })),
-    })),
-  clearCart: () => set({ items: [], voucherCode: "" }),
-  selectedItems: () => get().items.filter((item) => item.selected),
-  subtotal: () =>
-    get().items.reduce(
-      (sum, item) =>
-        item.selected ? sum + item.quantity * item.variant.price : sum,
-      0,
-    ),
-}));
+    {
+      name: "test-myshop-cart",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        items: state.items,
+        voucherCode: state.voucherCode,
+      }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
+    },
+  ),
+);

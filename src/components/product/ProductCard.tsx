@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Star } from "lucide-react";
 
+import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 import { formatCurrencyVND } from "@/lib/utils";
 import type { ProductNode } from "@/lib/mock-data";
 
@@ -16,7 +17,7 @@ export function ProductCard({ product }: { product: ProductNode }) {
       className="group overflow-hidden rounded-2xl bg-white shadow-shopee transition hover:-translate-y-0.5 hover:shadow-lg"
     >
       <div className="relative aspect-square overflow-hidden bg-bg">
-        <img
+        <ImageWithFallback
           src={product.thumbnail}
           alt={product.name}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"

@@ -3,27 +3,10 @@ import Link from "next/link";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { FlashSaleSection } from "@/components/home/FlashSaleSection";
 import { HeroSlider } from "@/components/home/HeroSlider";
+import { HomeInteractiveShowcase } from "@/components/home/HomeInteractiveShowcase";
 import { ProductGrid } from "@/components/home/ProductGrid";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { getCatalogCategories, getCatalogProducts } from "@/lib/catalog";
-
-const featuredGroups = [
-  {
-    title: "Deal nóng hôm nay",
-    description: "Giảm sâu cho công nghệ, thời trang và đồ gia dụng",
-    href: "/search?q=deal",
-  },
-  {
-    title: "Mall chính hãng",
-    description: "Chọn lọc từ các shop chính hãng và Mall",
-    href: "/search?q=mall",
-  },
-  {
-    title: "Gợi ý theo xu hướng",
-    description: "Sản phẩm đang bán chạy và được đánh giá cao",
-    href: "/search?q=best-seller",
-  },
-];
 
 export const dynamic = "force-dynamic";
 
@@ -72,23 +55,7 @@ export default async function HomePage() {
     <MainLayout>
       <main className="bg-bg">
         <div className="container-page space-y-6 py-6 md:py-8">
-          <section className="grid gap-4 md:grid-cols-3">
-            {featuredGroups.map((group) => (
-              <Link
-                key={group.title}
-                href={group.href}
-                className="group overflow-hidden rounded-3xl bg-white p-5 shadow-shopee transition hover:-translate-y-0.5"
-              >
-                <div className="mb-4 h-2 w-20 rounded-full shopee-gradient" />
-                <h2 className="text-lg font-bold text-text-primary group-hover:text-primary">
-                  {group.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-text-secondary">
-                  {group.description}
-                </p>
-              </Link>
-            ))}
-          </section>
+          <HomeInteractiveShowcase products={allProducts} />
 
           <HeroSlider />
           <FlashSaleSection />

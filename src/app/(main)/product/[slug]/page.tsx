@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { Star, Truck, ShieldCheck, Heart, ShoppingCart } from "lucide-react";
+import { Star, Truck, ShieldCheck } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { ProductGallery } from "@/components/product/ProductGallery";
-import { VariantSelector } from "@/components/product/VariantSelector";
 import { ProductGrid } from "@/components/home/ProductGrid";
-import { formatCurrencyVND } from "@/lib/utils";
+import { ProductGallery } from "@/components/product/ProductGallery";
+import { ProductDetailPurchasePanel } from "@/components/product/ProductDetailPurchasePanel";
+import { Button } from "@/components/ui/button";
 import { getCatalogProducts, getProductDetailBySlug } from "@/lib/catalog";
+import { formatCurrencyVND } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +31,7 @@ export default async function ProductPage({
 
   return (
     <main className="bg-bg">
-      <div className="container-page py-6 md:py-8 space-y-6">
+      <div className="container-page space-y-6 py-6 md:py-8">
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <ProductGallery images={product.images} name={product.name} />
           <div className="space-y-5 rounded-3xl bg-white p-5 shadow-shopee md:p-6">
@@ -43,7 +43,7 @@ export default async function ProductPage({
             </h1>
             <div className="flex flex-wrap items-center gap-3 text-sm text-text-secondary">
               <span className="inline-flex items-center gap-1 text-amber-500">
-                <Star className="h-4 w-4 fill-amber-500" />{" "}
+                <Star className="h-4 w-4 fill-amber-500" />
                 {product.ratingAvg.toFixed(2)}
               </span>
               <span>|</span>
@@ -67,15 +67,7 @@ export default async function ProductPage({
                 )}
               </p>
             </div>
-            <VariantSelector variants={product.variants} />
-            <div className="flex flex-wrap gap-3">
-              <Button variant="outline" className="flex-1 min-w-[180px]">
-                <ShoppingCart className="mr-2 h-4 w-4" /> Thêm vào giỏ
-              </Button>
-              <Button className="flex-1 min-w-[180px]">
-                <Heart className="mr-2 h-4 w-4" /> Mua ngay
-              </Button>
-            </div>
+            <ProductDetailPurchasePanel product={product} />
             <div className="grid gap-3 rounded-3xl bg-bg p-4 text-sm text-text-secondary sm:grid-cols-3">
               <div className="flex items-start gap-3">
                 <Truck className="mt-0.5 h-4 w-4 text-primary" />
@@ -175,6 +167,12 @@ export default async function ProductPage({
             </div>
           </aside>
         </section>
+
+        <ProductGrid
+          title="Gợi ý thêm cho bạn"
+          subtitle="Khám phá thêm các sản phẩm cùng ngành hàng đang được quan tâm"
+          products={similarProducts}
+        />
       </div>
     </main>
   );
