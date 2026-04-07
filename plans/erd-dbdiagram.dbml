@@ -1,0 +1,305 @@
+Enum user_role {
+  buyer
+  seller
+  admin
+}
+
+Enum product_status {
+  active
+  inactive
+  banned
+}
+
+Enum order_status {
+  pending
+  confirmed
+  processing
+  shipping
+  delivered
+  cancelled
+  refunded
+}
+
+Enum voucher_type {
+  percentage
+  fixed
+  free_ship
+}
+
+Table users {
+  id bigint [pk, increment]
+  email varchar(255) [not null, unique]
+  password_hash varchar
+  full_name varchar(255) [not null]
+  avatar varchar
+  phone varchar(30)
+  role user_role [not null, default: 'buyer']
+  is_verified boolean [not null, default: false]
+  created_at datetime [not null]
+}
+
+Table shops {
+  id bigint [pk, increment]
+  user_id bigint [not null, unique]
+  shop_name varchar(255) [not null]
+  slug varchar(255) [not null, unique]
+  avatar varchar
+  banner varchar
+  description text
+  rating decimal(3,2) [not null, default: 0]
+  total_sales bigint [not null, default: 0]
+  is_official boolean [not null, default: false]
+  is_mall boolean [not null, default: false]
+  created_at datetime [not null]
+}
+
+Table categories {
+  id bigint [pk, increment]
+  parent_id bigint
+  name varchar(255) [not null]
+  slug varchar(255) [not null, unique]
+  icon varchar
+  image varchar
+  sort_order int [not null, default: 0]
+  is_active boolean [not null, default: true]
+}
+
+Table products {
+  id bigint [pk, increment]
+  shop_id bigint [not null]
+  category_id bigint [not null]
+  name varchar(255) [not null]
+  slug varchar(255) [not null, unique]
+  description text
+  thumbnail varchar
+  images json [not null]
+  status product_status [not null, default: 'active']
+  is_featured boolean [not null, default: false]
+  sold_count bigint [not null, default: 0]
+  view_count bigint [not null, default: 0]
+  rating_avg decimal(3,2) [not null, default: 0]
+  rating_count bigint [not null, default: 0]
+  created_at datetime [not null]
+
+  indexes {
+    shop_id
+    category_id
+    status
+    is_featured
+  }
+}
+
+Table product_variants {
+  id bigint [pk, increment]
+  product_id bigint [not null]
+  sku varchar(100) [not null, unique]
+  attributes json [not null]
+  price bigint [not null]
+  original_price bigint [not null]
+  stock int [not null]
+  images json [not null]
+
+  indexes {
+    product_id
+  }
+}
+
+Table product_attributes {
+  id bigint [pk, increment]
+  product_id bigint [not null]
+  attribute_name varchar(120) [not null]
+  attribute_values json [not null]
+}
+
+Table flash_sales {
+  id bigint [pk, increment]
+  product_variant_id bigint [not null, unique]
+  flash_price bigint [not null]
+  original_price bigint [not null]
+  stock int [not null]
+  sold int [not null, default: 0]
+  start_time datetime [not null]
+  end_time datetime [not null]
+  is_active boolean [not null, default: true]
+}
+
+Table carts {
+  id bigint [pk, increment]
+  user_id bigint [not null, unique]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table cart_items {
+  id bigint [pk, increment]
+  cart_id bigint [not null]
+  product_variant_id bigint [not null]
+  quantity int [not null, default: 1]
+  is_selected boolean [not null, default: true]
+
+  indexes {
+    (cart_id, product_variant_id) [unique]
+    cart_id
+    product_variant_id
+  }
+}
+
+Table orders {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  shop_id bigint [not null]
+  order_code varchar(40) [not null, unique]
+  status order_status [not null, default: 'pending']
+  shipping_address json [not null]
+  subtotal bigint [not null]
+  shipping_fee bigint [not null, default: 0]
+  discount bigint [not null, default: 0]
+  total bigint [not null]
+  payment_method varchar [not null]
+  payment_status varchar [not null, default: 'pending']
+  note text
+  created_at datetime [not null]
+
+  indexes {
+    user_id
+    shop_id
+    status
+  }
+}
+
+Table order_items {
+  id bigint [pk, increment]
+  order_id bigint [not null]
+  product_variant_id bigint [not null]
+  product_snapshot json [not null]
+  quantity int [not null]
+  unit_price bigint [not null]
+  total_price bigint [not null]
+
+  indexes {
+    order_id
+  }
+}
+
+Table reviews {
+  id bigint [pk, increment]
+  order_item_id bigint [not null, unique]
+  user_id bigint [not null]
+  product_id bigint [not null]
+  rating int [not null]
+  comment text
+  images json [not null]
+  seller_reply text
+  is_verified_purchase boolean [not null, default: true]
+  helpful_count int [not null, default: 0]
+  created_at datetime [not null]
+
+  indexes {
+    product_id
+  }
+}
+
+Table addresses {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  full_name varchar(255) [not null]
+  phone varchar(30) [not null]
+  province varchar(100) [not null]
+  district varchar(100) [not null]
+  ward varchar(100) [not null]
+  address_detail text [not null]
+  is_default boolean [not null, default: false]
+
+  indexes {
+    user_id
+  }
+}
+
+Table vouchers {
+  id bigint [pk, increment]
+  shop_id bigint
+  code varchar(80) [not null, unique]
+  type voucher_type [not null]
+  value bigint [not null]
+  min_order_value bigint [not null, default: 0]
+  max_discount bigint [not null, default: 0]
+  usage_limit int [not null, default: 0]
+  used_count int [not null, default: 0]
+  start_date datetime [not null]
+  end_date datetime [not null]
+
+  indexes {
+    shop_id
+  }
+}
+
+Table notifications {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  type varchar(80) [not null]
+  title varchar(255) [not null]
+  message text [not null]
+  data json [not null]
+  is_read boolean [not null, default: false]
+  created_at datetime [not null]
+
+  indexes {
+    user_id
+  }
+}
+
+Table wishlists {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  product_id bigint [not null]
+  created_at datetime [not null]
+
+  indexes {
+    (user_id, product_id) [unique]
+    user_id
+  }
+}
+
+Table chat_sessions {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  session_data json [not null]
+  created_at datetime [not null]
+
+  indexes {
+    user_id
+  }
+}
+
+Table shipping_providers {
+  id bigint [pk, increment]
+  name varchar(255) [not null]
+  code varchar(80) [not null, unique]
+  api_endpoint text [not null]
+  is_active boolean [not null, default: true]
+  supported_services json [not null]
+}
+
+Ref: shops.user_id > users.id [delete: cascade]
+Ref: categories.parent_id > categories.id [delete: cascade]
+Ref: products.shop_id > shops.id [delete: cascade]
+Ref: products.category_id > categories.id [delete: restrict]
+Ref: product_variants.product_id > products.id [delete: cascade]
+Ref: product_attributes.product_id > products.id [delete: cascade]
+Ref: flash_sales.product_variant_id > product_variants.id [delete: cascade]
+Ref: carts.user_id > users.id [delete: cascade]
+Ref: cart_items.cart_id > carts.id [delete: cascade]
+Ref: cart_items.product_variant_id > product_variants.id [delete: cascade]
+Ref: orders.user_id > users.id [delete: restrict]
+Ref: orders.shop_id > shops.id [delete: restrict]
+Ref: order_items.order_id > orders.id [delete: cascade]
+Ref: order_items.product_variant_id > product_variants.id [delete: restrict]
+Ref: reviews.order_item_id > order_items.id [delete: cascade]
+Ref: reviews.user_id > users.id [delete: cascade]
+Ref: reviews.product_id > products.id [delete: cascade]
+Ref: addresses.user_id > users.id [delete: cascade]
+Ref: vouchers.shop_id > shops.id [delete: set null]
+Ref: notifications.user_id > users.id [delete: cascade]
+Ref: wishlists.user_id > users.id [delete: cascade]
+Ref: wishlists.product_id > products.id [delete: cascade]
+Ref: chat_sessions.user_id > users.id [delete: cascade]
